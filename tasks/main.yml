@@ -1,0 +1,21 @@
+---
+- name: Import OpenVPN apt key
+  apt_key:
+    url: https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+    state: present
+
+- name: Add OpenVPN repo
+  get_url:
+    url: "https://swupdate.openvpn.net/community/openvpn3/repos/openvpn3-{{ host_distribution_release if host_distribution_release is defined else ansible_distribution_release }}.list"
+    dest: /etc/apt/sources.list.d/openvpn3.list
+  register: openvpn_key
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: openvpn_key.changed
+
+- name: Install OpenVPN
+  apt:
+    name: openvpn3
+
